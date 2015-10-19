@@ -16,6 +16,10 @@ module MultiFetchFragments
     ('cache_safe_' + @variable_counter.to_s).to_sym
   end
 
+  def run_proc_on_collection
+    @options[:proc].call(@collection) if @options[:proc]
+  end
+
   def retrieve_template_keys_with_multi_fetch_cache
     keys = @locals.keys
     keys << @variable         if defined?(@object) || @collection
@@ -31,6 +35,8 @@ module MultiFetchFragments
     if layout = @options[:layout]
       layout = find_template(layout, @template_keys)
     end
+
+    run_proc_on_collection
 
     index = -1
     @collection.map do |object|
@@ -49,6 +55,8 @@ module MultiFetchFragments
     view, locals, collection_data = @view, @locals, @collection_data
     cache = {}
     keys  = @locals.keys
+
+    run_proc_on_collection
 
     index = -1
     @collection.map do |object|
